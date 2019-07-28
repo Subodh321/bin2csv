@@ -1,0 +1,3 @@
+[Project]
+Manager=KDevCustomMakeManager
+Name=bin2csv
