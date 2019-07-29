@@ -11,8 +11,8 @@ compile:
 
 To run the conversion just supply
 bin2csv with an input binary file and an output csv file.
-(tested only on x64 linux). 
-I am a c++ beginner so errors are likely 
+(tested only on x64 linux).
+I am a c++ beginner so errors are likely
 
 ////////////////////////////////////////////////////////*/
 
@@ -50,21 +50,22 @@ private:
      std::ofstream *oFile{nullptr};
      std::stringstream *ss{nullptr};
      Metadata_t *meta_d;
-     bool fileOk{false};
 
 public:
-     BaseClass ( std::string ifl, std::string ofl )
+     BaseClass ( ) { }
+
+     int openFiles ( std::string ifl, std::string ofl )
      {
           iFile = new std::ifstream ( ifl, std::ios::binary );
           oFile = new std::ofstream ( ofl, std::ios::trunc );
-
           if ( !iFile->is_open() ) {
                std::cerr << "cannot open input file!\n";
+               return 0;
           } else if ( !oFile->is_open() ) {
                std::cerr << "cannot output file!\n";
+               return 0;
 
           } else {
-               fileOk = true;
                if ( this->readMeta() ) {
                     if ( meta_d->recordEightBits ) {
                          readData<Block8_t>();
@@ -73,6 +74,8 @@ public:
                     }
                }
           }
+
+          return 1;
      }
 
      bool readMeta()
@@ -95,9 +98,9 @@ public:
           ss = new std::stringstream;
           *ss << "# adcFrequency:\t\t" << meta_d->adcFrequency << "\n"
               << "# cpuFrequency:\t\t" << meta_d->cpuFrequency << "\n"
-			  << "# sampleInterval\t" << meta_d->sampleInterval << "\n"
+              << "# sampleInterval\t" << meta_d->sampleInterval << "\n"
               << "# recordEightBits\t" << std::boolalpha << ( bool ) meta_d->recordEightBits << "\n"
-			<< "# pinCount\t\t" << meta_d->pinCount << "\n"
+              << "# pinCount\t\t" << meta_d->pinCount << "\n"
               << "# PinNumber(s)\t\t";
           for ( unsigned int i=0; i<meta_d->pinCount; i++ ) {
                *ss << meta_d->pinNumber[i];
@@ -158,22 +161,25 @@ public:
           }
           iFile->close();
           oFile->close();
-          delete iFile;
-          delete oFile;
+          if ( iFile != 0 ) {
+               delete iFile;
+          }
+          if ( oFile != 0 ) {
+               delete oFile;
+          }
      }
 };
 
 int main ( int argc, char* argv[] )
 {
-     std::string iFileName;
-     std::string oFileName;
+     std::string iFileName{"na"};
+     std::string oFileName{""};
 
      switch ( argc ) {
      case 1:
           std::cerr << "Usage: \t" << argv[0] << " input.bin output.csv\n";
           break;
      case 2:
-		 iFileName = argv[1];
           std::cerr << "ERROR, no output file specified!\n";
           break;
      case 3:
@@ -185,6 +191,9 @@ int main ( int argc, char* argv[] )
           std::cerr << "ERROR, too much arguments specified, need two!\n";
      }
 
-     BaseClass baseC ( iFileName, oFileName );
+     BaseClass baseC;
+     if ( !baseC.openFiles ( iFileName, oFileName ) ) {
+          return 1;
+     }
      return 0;
 }
