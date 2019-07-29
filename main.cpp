@@ -1,3 +1,22 @@
+/*///////////////////////////////////////////////////////
+
+bin2csv is to convert binary files produced by SdFats
+"AnalogBinLogger"
+
+https://github.com/greiman/SdFat/tree/master/examples/AnalogBinLogger
+
+compile:
+# cd bin2csv
+# make
+
+To run the conversion just supply
+bin2csv with an input binary file and an output csv file.
+(tested only on x64 linux). 
+I am a c++ beginner so errors are likely 
+
+////////////////////////////////////////////////////////*/
+
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -154,6 +173,7 @@ int main ( int argc, char* argv[] )
           std::cerr << "Usage: \t" << argv[0] << " input.bin output.csv\n";
           break;
      case 2:
+		 iFileName = argv[1];
           std::cerr << "ERROR, no output file specified!\n";
           break;
      case 3:
